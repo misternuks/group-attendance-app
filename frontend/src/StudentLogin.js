@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import styles from './StudentLogin.module.css';
 
 const StudentLogin = ({ onLoginSuccess }) => {
   const [studentId, setStudentId] = useState('');
@@ -19,22 +20,24 @@ const StudentLogin = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>Student Login</h2>
       <input
         type="text"
+        className={styles.input}
         placeholder="Student ID"
         value={studentId}
         onChange={(e) => setStudentId(e.target.value)}
       />
       <input
         type="text"
+        className={styles.input}
         placeholder="Class Code"
         value={classCode}
         onChange={(e) => setClassCode(e.target.value)}
       />
-      <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <button className={styles.button} onClick={handleLogin}>Login</button>
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };

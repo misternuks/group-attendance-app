@@ -1,0 +1,38 @@
+.container {
+  padding: 1rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.button:hover {
+  background-color: #218838;
+}
+
+.group {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.groupTitle {
+  font-weight: bold;
+}
+
+.list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.listItem {
+  margin-bottom: 0.5rem;
+}
