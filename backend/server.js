@@ -1,10 +1,18 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 const PORT = 5000;
 
 // Load student data from CSV
@@ -44,6 +52,7 @@ app.post('/api/start-session', (req, res) => {
   currentSession.students = {};
   currentSession.groups = [];
   res.json({ classCode: currentSession.classCode });
+  io.emit('sessionStarted', { classCode: currentSession.classCode });
 });
 
 // Route for student login
@@ -72,6 +81,9 @@ app.post('/api/login', (req, res) => {
   // Regenerate groups
   regenerateGroups();
 
+  // Broadcast updated groups
+  io.emit('groupsUpdated', currentSession.groups);
+
   res.json({ success: true, student });
 });
 
@@ -91,7 +103,17 @@ const regenerateGroups = () => {
   }
 };
 
+// Socket.io connection
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.emit('groupsUpdated', currentSession.groups);
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import styles from './StudentLogin.module.css';
 
-const StudentLogin = ({ onLoginSuccess }) => {
+const StudentLogin = () => {
   const [studentId, setStudentId] = useState('');
   const [classCode, setClassCode] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -13,7 +15,9 @@ const StudentLogin = ({ onLoginSuccess }) => {
         studentId,
         classCode,
       });
-      onLoginSuccess(response.data.student);
+      // Store student information in local storage for StudentView
+      localStorage.setItem('loggedInStudent', JSON.stringify(response.data.student));
+      navigate('/student-view');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     }

@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { io } from 'socket.io-client';
 import styles from './AdminView.module.css';
+
+const socket = io('http://localhost:5000');
 
 const AdminView = () => {
   const [classCode, setClassCode] = useState('');
   const [groups, setGroups] = useState([]);
 
+  useEffect(() => {
+    socket.on('sessionStarted', (data) => {
+      setClassCode(data.classCode);
+    });
+
+    socket.on('groupsUpdated', (updatedGroups) => {
+      setGroups(updatedGroups);
+    });
+  }, []);
+
   const startSession = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/start-session');
-      setClassCode(response.data.classCode);
+      const response = await fetch('http://localhost:5000/api/start-session', {
+        method: 'POST'
+      });
+      const data = await response.json();
+      setClassCode(data.classCode);
     } catch (err) {
       console.error('Error starting session:', err);
     }
   };
-
-  const fetchGroups = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/groups');
-      setGroups(response.data.groups);
-    } catch (err) {
-      console.error('Error fetching groups:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (classCode) {
-      fetchGroups();
-    }
-  }, [classCode]);
 
   return (
     <div className={styles.container}>
