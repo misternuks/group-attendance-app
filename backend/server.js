@@ -46,6 +46,11 @@ let currentSession = {
 // Generate a random class code
 const generateClassCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
+// Route to get the current session information
+app.get('/api/current-session', (req, res) => {
+  res.json({ classCode: currentSession.classCode });
+});
+
 // Route to start a new session
 app.post('/api/start-session', (req, res) => {
   currentSession.classCode = generateClassCode();

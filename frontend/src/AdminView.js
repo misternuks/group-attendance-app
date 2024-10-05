@@ -9,6 +9,19 @@ const AdminView = () => {
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
+    // Fetch the current class code when the component mounts
+    const fetchClassCode = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/current-session');
+        const data = await response.json();
+        setClassCode(data.classCode);
+      } catch (err) {
+        console.error('Error fetching class code:', err);
+      }
+    };
+    fetchClassCode();
+
+    // Listen for real-time updates to the session and groups
     socket.on('sessionStarted', (data) => {
       setClassCode(data.classCode);
     });
@@ -16,6 +29,12 @@ const AdminView = () => {
     socket.on('groupsUpdated', (updatedGroups) => {
       setGroups(updatedGroups);
     });
+
+    // Cleanup listeners on component unmount
+    return () => {
+      socket.off('sessionStarted');
+      socket.off('groupsUpdated');
+    };
   }, []);
 
   const startSession = async () => {
