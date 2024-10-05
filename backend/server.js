@@ -1,3 +1,4 @@
+// server.js
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
@@ -13,10 +14,13 @@ fs.readFile(csvFilePath, 'utf8', (err, data) => {
   if (err) {
     console.error('Error reading CSV file:', err);
   } else {
-    students = data.split('\n').map(line => {
-      const [id, name] = line.split(',');
-      return { id: id.trim(), name: name.trim() };
-    });
+    students = data.split('\n')
+      .map(line => line.split(','))
+      .filter(parts => parts.length === 2 && parts[0].trim() && parts[1].trim())
+      .map(parts => {
+        const [id, name] = parts;
+        return { id: id.trim(), name: name.trim() };
+      });
   }
 });
 
@@ -39,7 +43,7 @@ app.post('/api/start-session', (req, res) => {
   currentSession.classCode = generateClassCode();
   currentSession.students = {};
   currentSession.groups = [];
-  res.json({ classCode: currentSession.classCode })
+  res.json({ classCode: currentSession.classCode });
 });
 
 // Route for student login
@@ -48,7 +52,7 @@ app.post('/api/login', (req, res) => {
 
   // Validate class code
   if (classCode !== currentSession.classCode) {
-    return res.status(400).json({ error: 'Invalid class code '});
+    return res.status(400).json({ error: 'Invalid class code' });
   }
 
   // Validate student ID
@@ -63,12 +67,12 @@ app.post('/api/login', (req, res) => {
   }
 
   // Add student to the session
-  currentSession.students[studenId] = student;
+  currentSession.students[studentId] = student;
 
   // Regenerate groups
   regenerateGroups();
 
-  res.json({ success: true, student })
+  res.json({ success: true, student });
 });
 
 // Route to get the current groups
@@ -87,12 +91,7 @@ const regenerateGroups = () => {
   }
 };
 
-// Basic route to ensure the server is running
-app.get('/', (req, res) => {
-  res.send('Backend server is running.');
-});
-
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}.`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
